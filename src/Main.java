@@ -15,74 +15,44 @@ class TextStatistics {
             List<String> lines = Files.readAllLines(Paths.get(inputFile));
 
             // Подсчет статистики
-            int totalCharacters = countTotalCharacters(text);
-            int totalCharactersNoSpaces = countCharactersNoSpaces(text);
+            int totalCharacters = text.length();
+            int totalCharactersNoSpaces = text.replace(" ", "").length();
             int totalWords = countWords(text);
-            int totalLines = countLines(lines);
+            int totalLines = lines.size();
             int totalParagraphs = countParagraphs(text);
             int totalPages = countPages(text);
 
-            // Формирование вывода в формате StringBuilder для обычного текста
-            StringBuilder stats = new StringBuilder();
-            stats.append("Статистика по тексту:\n");
-            stats.append("1. Всего символов (включая пробелы): ").append(totalCharacters).append("\n");
-            stats.append("2. Всего символов (не включая пробелы): ").append(totalCharactersNoSpaces).append("\n");
-            stats.append("3. Всего слов: ").append(totalWords).append("\n");
-            stats.append("4. Всего строк: ").append(totalLines).append("\n");
-            stats.append("5. Всего абзацев: ").append(totalParagraphs).append("\n");
-            stats.append("6. Всего страниц : ").append(totalPages).append("\n");
+            // Форматирование вывода
+            String statsFormat = "Статистика по тексту:\n" +
+                    "1. Всего символов (включая пробелы): %d\n" +
+                    "2. Всего символов (не включая пробелы): %d\n" +
+                    "3. Всего слов: %d\n" +
+                    "4. Всего строк: %d\n" +
+                    "5. Всего абзацев: %d\n" +
+                    "6. Всего страниц: %d\n";
 
-            // Формирование вывода для svc
-            StringBuilder svcStats = new StringBuilder();
-            svcStats.append("Ститистика по тексту: \n");
-            svcStats.append("Всего символов (включая пробелы),").append(totalCharacters).append("\n");
-            svcStats.append("Всего символов (не включая пробелы),").append(totalCharactersNoSpaces).append("\n");
-            svcStats.append("Всего слов,").append(totalWords).append("\n");
-            svcStats.append("Всего строк,").append(totalLines).append("\n");
-            svcStats.append("Всего абзацев,").append(totalParagraphs).append("\n");
-            svcStats.append("Всего страниц,").append(totalPages).append("\n");
+            String stats = String.format(statsFormat, totalCharacters, totalCharactersNoSpaces, totalWords, totalLines, totalParagraphs, totalPages);
 
             // Вывод в консоль
-            System.out.println(stats.toString());
-
+            System.out.println(stats);
             // Запись в текстовый файл
-            writeToFile(outputFile, stats.toString());
-
-            // Запись в CSV-файл
-            writeToFile(svcOutputFile, svcStats.toString());
-
+            writeToFile(outputFile, stats);
+            // Запись в svc-файл (в этом случае просто используем тот же формат)
+            writeToFile(svcOutputFile, stats);
         } catch (IOException e) {
             System.err.println("Ошибка чтения файла: " + e.getMessage());
         }
     }
-
-    // Метод для подсчета всех символов в тексте
-    public static int countTotalCharacters(String text) {
-        return text.length();
-    }
-
-    // Метод для подсчета всех символов без пробелов
-    public static int countCharactersNoSpaces(String text) {
-        return text.replace(" ", "").length();
-    }
-
     // Метод для подсчета слов
     public static int countWords(String text) {
         String[] words = text.trim().split("\\s+");
         return words.length;
     }
-
-    // Метод для подсчета строк
-    public static int countLines(List<String> lines) {
-        return lines.size();
-    }
-
     // Метод для подсчета абзацев
     public static int countParagraphs(String text) {
         String[] paragraphs = text.split("\\n(\\t|\\s{4})");
         return paragraphs.length;
     }
-
     // Метод для подсчета страниц
     public static int countPages(String text) {
         int pageCount = 1;  // Начинаем с одной страницы по умолчанию
@@ -93,7 +63,6 @@ class TextStatistics {
         }
         return pageCount;
     }
-
     // Метод для записи статистики в файл
     public static void writeToFile(String filePath, String content) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
